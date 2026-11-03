@@ -1,0 +1,9 @@
+# Machine start time candidate
+
+Optional HH:mm machine start time on the production date. No automatic timestamps, timezone conversion, end time or duration. Existing records stay without a start time until explicitly edited. Included in entry, edit, history, full/filtered CSV export, previous snapshot CSV and restore.
+
+27 tests passed including the private November 2 fixture (26 reproducible without it). Added valid/invalid time, extended CSV round trip with reasons, storage reload, blank-vs-missing equality, changed-time conflicts and invalid-tail rejection. Existing historical CSV schemas remain accepted. Private fixtures are not committed.
+
+The current storage key and schema remain unchanged; no migration or startup write. New exports append startTime to the CSV schema. Previous v0.6 code cannot import the extended CSV and can omit this field when editing/exporting a timed record. Keep earlier backups and use the updated application for timed records. Shared older Patch 1/legacy pages remain unchanged and should not be used to edit timed records.
+
+Not deployed. Browser and iPhone checks still required: enter a start time, save and reopen, edit/clear the time, verify AM/PM display including midnight, export and restore through the separate Restore Test page, and check old records and quantities remain unchanged. Normal candidate page count/revision should stay unchanged by Restore Test. Promotion requires user approval.

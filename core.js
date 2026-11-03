@@ -2,6 +2,7 @@
 (function(root){
 'use strict';
 const fields=['id','date','shift','part','operation','machine','person','produced','nc','scrap','accountingVersion','createdAt','updatedAt','ncReasonsJSON','scrapReasonsJSON'];
+const exportFields=[...fields,'startTime'];
 function parseCSV(text){
  text=text.replace(/^\ufeff/,'');let rows=[],row=[],cell='',state='start';
  function end(){row.push(cell);cell='';state='start'}
@@ -18,6 +19,7 @@ function parseCSV(text){
 function validate(r){
  if(!r||typeof r!=='object'||typeof r.id!=='string'||!r.id.trim()||r.id.length>200)throw Error('Invalid record ID');
  if(!/^\d{4}-\d{2}-\d{2}$/.test(r.date)||new Date(r.date+'T00:00:00Z').toISOString().slice(0,10)!==r.date)throw Error('Invalid date');
+ if(r.startTime!==undefined&&r.startTime!==''&&(typeof r.startTime!=='string'||!/^([01]\d|2[0-3]):[0-5]\d$/.test(r.startTime)))throw Error('Invalid machine start time');
  if(!['1st Shift','2nd Shift','3rd Shift'].includes(r.shift))throw Error('Invalid shift');
  for(const k of ['part','operation','machine','person'])if(typeof r[k]!=='string'||!r[k].trim()||r[k].length>80)throw Error('Invalid '+k);
  for(const k of ['produced','nc','scrap'])if(!Number.isSafeInteger(r[k])||r[k]<0)throw Error('Invalid quantity');
@@ -29,11 +31,11 @@ function validate(r){
 }
 function validateAll(a){if(!Array.isArray(a)||a.length>50000)throw Error('Invalid record collection');const ids=new Set();for(const r of a){validate(r);if(ids.has(r.id))throw Error('Duplicate ID within backup');ids.add(r.id)}return a}
 function decodeCSV(text){if(text.length>10*1024*1024)throw Error('Backup exceeds 10 MB limit');const rows=parseCSV(text),h=rows.shift();
- const schemas=[fields,fields.slice(0,13),fields.filter(k=>!['accountingVersion','ncReasonsJSON','scrapReasonsJSON'].includes(k))];
+ const schemas=[exportFields,fields,fields.slice(0,13),fields.filter(k=>!['accountingVersion','ncReasonsJSON','scrapReasonsJSON'].includes(k))];
  const schema=schemas.find(s=>h&&h.length===s.length&&s.every((k,i)=>h[i]===k));if(!schema)throw Error('Unrecognized Production Tracker CSV headers');
- return validateAll(rows.map((a,i)=>{try{if(a.length!==schema.length)throw Error('Wrong column count');let r=Object.fromEntries(schema.map((k,j)=>[k,a[j]]));for(const k of ['produced','nc','scrap']){if(!/^\d+$/.test(r[k]))throw Error('Quantity must be a whole number');r[k]=Number(r[k])}r.accountingVersion=schema.includes('accountingVersion')?Number(r.accountingVersion):1;for(const k of ['nc','scrap']){r[k+'Reasons']=schema===fields?JSON.parse(r[k+'ReasonsJSON']||'[]'):[];delete r[k+'ReasonsJSON']}return validate(r)}catch(e){throw Error('Row '+(i+2)+': '+e.message)}}));
+ return validateAll(rows.map((a,i)=>{try{if(a.length!==schema.length)throw Error('Wrong column count');let r=Object.fromEntries(schema.map((k,j)=>[k,a[j]]));for(const k of ['produced','nc','scrap']){if(!/^\d+$/.test(r[k]))throw Error('Quantity must be a whole number');r[k]=Number(r[k])}r.accountingVersion=schema.includes('accountingVersion')?Number(r.accountingVersion):1;for(const k of ['nc','scrap']){r[k+'Reasons']=schema.includes(k+'ReasonsJSON')?JSON.parse(r[k+'ReasonsJSON']||'[]'):[];delete r[k+'ReasonsJSON']}return validate(r)}catch(e){throw Error('Row '+(i+2)+': '+e.message)}}));
 }
-function comparable(r){return fields.map(k=>k.endsWith('ReasonsJSON')?r[k.replace('JSON','')].map(x=>[x.reason,x.quantity]):r[k])}
+function comparable(r){return exportFields.map(k=>k.endsWith('ReasonsJSON')?r[k.replace('JSON','')].map(x=>[x.reason,x.quantity]):k==='startTime'?(r[k]||''):r[k])}
 function merge(existing,incoming){validateAll(existing);validateAll(incoming);const ids=new Map(existing.map(r=>[r.id,r]));let added=0,duplicates=0,conflicts=0,next=[...existing];for(const r of incoming){if(ids.has(r.id)){duplicates++;if(JSON.stringify(comparable(ids.get(r.id)))!==JSON.stringify(comparable(r)))conflicts++}else{next.push(r);ids.set(r.id,r);added++}}return {next,added,duplicates,conflicts}}
 function checksum(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(16)}
 function pack(records,revision){validateAll(records);const data=JSON.stringify(records);return JSON.stringify({schema:6,revision,savedAt:new Date().toISOString(),checksum:checksum(data),records})}
@@ -49,5 +51,6 @@ class Store{
  }
  previous(){const x=this.s.getItem(this.key+'.previous');if(x===null)throw Error('No previous snapshot available');return unpack(x).records}
 }
-root.PT={fields,parseCSV,decodeCSV,validate,validateAll,merge,pack,unpack,Store};
+root.PT={fields,exportFields,parseCSV,decodeCSV,validate,validateAll,merge,pack,unpack,Store};
 })(typeof module==='object'?module.exports:window);
+
