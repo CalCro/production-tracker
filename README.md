@@ -1,33 +1,25 @@
-# Production Tracker v0.6 — isolated recovery candidate
+# Production Tracker v0.6 Personal Edition — release review
 
-Not approved for production. Existing v0.5 applications, backups and unrelated repositories are untouched. This repository contains generic application code and synthetic tests only.
+Status: prepared for approval; not deployed. The live Pages branch is candidate/v0.6-recovery. Do not merge this proposal until the user explicitly approves promotion.
 
-## Run and test
+## Proposed deployment
 
-Serve `index.html` and `core.js` over HTTPS (GitHub Pages: candidate branch, repository root). No dependencies or server are needed. `node test.cjs` runs the generic tests. The optional `PT_LOCAL_FIXTURE` environment variable points to a private CSV outside this checkout; never commit that file.
+Merge the reviewed release commit into candidate/v0.6-recovery, which already backs GitHub Pages. This replaces index.html and core.js at the existing address with the tested Patch 1 application and a Personal Edition label. Keep main unchanged. Confirm the base has not changed before merging.
 
-## Safeguards
+Storage key and schema remain production_tracker_v06_candidate / schema 6. No data migration, reset or automatic write runs on startup. Existing browser records and snapshots remain in place. No real employee or production data is in the release.
 
-- Uses `production_tracker_v06_candidate`, never the v0.5 storage key.
-- CSV file chooser and paste fallback, visible progress/errors, full validation before a preview, explicit confirmation before adding records.
-- Supports v0.1, v0.2 and v0.3–v0.5 CSV headers. All rows validate before any write. Existing IDs are retained; conflicts are counted and skipped. Future dates from old backups remain visible with a warning.
-- Read-back verified local saves, checksum integrity checks, previous valid snapshot, fail-closed recovery when primary data is invalid. The checksum detects accidental changes, not malicious tampering.
-- Web Locks serialize writes and stale revisions reject cross-tab overwrites. Browsers without Web Locks remain read only. No silent data reset or automatic migration.
-- Download Previous Snapshot CSV exports the preceding valid state. Restore by previewing that CSV in a fresh candidate origin/browser. Import is additive, so it does not roll back edits with the same ID. No destructive replace operation is offered.
-- CSV downloads are external backups. A download click cannot prove the file was saved successfully; check Files. Browser storage is not guaranteed against OS eviction, private browsing, clearing website data or device loss.
-- No analytics, external scripts, network submission or account sync. Employee data entered by the user stays in their browser; downloaded CSVs contain that data and must be kept private.
+The old root application is preserved as legacy/v06-recovery/index.html with its matching core.js. The existing patch1/ pages remain unchanged. restore-test.html at the root uses the same separate test key as patch1/restore-test.html; those two test URLs share only their test records.
 
-## iPhone validation (Safari, candidate address only)
+## Review evidence
 
-1. Preserve v0.5 and the original CSV in Files. Open the HTTPS candidate in a normal Safari tab. Check the candidate banner and diagnostics: zero records, no recovery error.
-2. Open History & Reports. Tap Preview Selected CSV with no file: expect a visible instruction and zero changes.
-3. Choose the recovered November 2 CSV from Files. Tap Preview Selected CSV: expect one valid/new row and no writes. Cancel Preview: still zero records.
-4. Preview again and Confirm Add New Records. Expect one imported record. Compare every field, quantity and reason with your backup; do not send employee screenshots publicly.
-5. Close Safari and reopen the exact same address. Expect one record. Import the same file again: zero new records and one skipped ID.
-6. Tap Backup All CSV. Confirm the new CSV exists in Files. Preview it: zero new records. Do not delete the original.
-7. Create a synthetic record (DEMO-PART, OP 10, DEMO-MACHINE, DEMO-OPERATOR; 10 produced, 2 NC, 1 scrap). Confirm good parts = 7. Edit its produced count to 11, then reopen and check 11. Delete only that synthetic record; the recovered record must remain.
-8. Download Previous Snapshot CSV. Preview it; confirm it is valid. Existing IDs must not overwrite current records. To test a true restore without replacing candidate records, use a separate normal browser/origin with empty storage.
-9. Paste an invalid CSV in the fallback and preview: visible error and unchanged record count. Paste the complete valid CSV: same duplicate preview as file import.
-10. Open the candidate in two Safari tabs. Save a synthetic record in one; the other must show a reload warning or reject its stale save. Reload and confirm no record was lost.
+See patch1/VALIDATION.md for automated, desktop browser, and supplied iPhone evidence and their limits. Root application logic is byte-identical to tested Patch 1 core.js. Root HTML differs from Patch 1 only in release wording. Run node test.cjs; PT_LOCAL_FIXTURE can point to a private local fixture outside the repository.
 
-Desktop browser tests do not establish iPhone Files picker, Safari persistence, download behavior or home-screen-app behavior. Those require the checks above before approval.
+The selected backup restoration and original record-count separation were demonstrated on iPhone. The normal candidate revision after that restore was not shown. No offline shell, cloud account, synchronization, guarantee against Safari eviction, or home-screen-specific validation is included.
+
+## Before and after approved promotion
+
+Before: download Backup All CSV from the normal candidate and retain all earlier backups. Do not clear Safari data.
+
+After: reopen the usual URL, confirm Personal Edition, check the preexisting count, quantities, reasons and diagnostics, and export a fresh backup. Any new failure should stop further entry until reviewed.
+
+Rollback: restore the prior root index.html/core.js from legacy/v06-recovery in a new commit on the serving branch. This reverts code only; it does not roll back records. Export current data before any recovery work. Additive CSV import never overwrites an existing ID, including an edited record.
