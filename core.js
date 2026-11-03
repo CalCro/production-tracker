@@ -42,7 +42,7 @@ class Store{
  load(){try{this.raw=this.s.getItem(this.key);if(this.raw===null){if(this.s.getItem(this.key+'.previous')!==null)throw Error('Primary missing; previous snapshot available');return []}const x=unpack(this.raw);this.revision=x.revision;return x.records}catch(e){this.blocked=true;throw e}}
  save(next){if(this.blocked)throw Error('Storage is locked for recovery');validateAll(next);if(this.s.getItem(this.key)!==this.raw){this.blocked=true;throw Error('Another tab changed data. Reload before saving')}
  const raw=pack(next,this.revision+1);
- if(this.raw!==null){this.s.setItem(this.key+'.previous',this.raw);if(this.s.getItem(this.key+'.previous')!==this.raw)throw Error('Snapshot verification failed')}
+ const previous=this.raw===null?pack([],0):this.raw;this.s.setItem(this.key+'.previous',previous);if(this.s.getItem(this.key+'.previous')!==previous)throw Error('Snapshot verification failed');
  try{this.s.setItem(this.key,raw);if(this.s.getItem(this.key)!==raw)throw Error('Save verification failed')}catch(e){this.blocked=true;throw e}
  this.raw=raw;this.revision++;return next;
  }
