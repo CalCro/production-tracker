@@ -1,0 +1,1 @@
+{"name":"production-tracker-candidate","version":"0.6.0","private":true,"scripts":{"test":"node test.cjs"}}
