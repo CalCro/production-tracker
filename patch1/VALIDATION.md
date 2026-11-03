@@ -47,3 +47,11 @@ Environment: remote desktop Chrome over the published HTTPS address. Synthetic r
 - No application source changes were required by this workflow. The synthetic test records remain in the remote browser only; no user-device data was changed.
 
 Still requires iPhone confirmation: Patch 1 date-control layout, restoring the user's actual downloaded backup through iOS Files, unchanged normal records afterward, and full Safari close/reopen persistence. Candidate promotion remains pending approval.
+
+## iPhone evidence supplied after browser validation
+
+User-supplied screenshots and report confirm a downloaded CSV restored successfully in Restore Test, displayed quantities and reasons, and survived closing/reopening Safari. An unchanged CSV preview showed zero new IDs and zero conflicts. Production date and shift are stacked without overlap on the supplied restore page.
+
+A subsequent pair of screenshots shows the normal candidate retaining its earlier record count while Restore Test has its separate restored collection. Counts support isolation; the screenshots do not show the normal candidate's diagnostic revision. No independent byte comparison of the user's two collections was performed. The restore test covers the selected backup, not proof that it contains every normal candidate record.
+
+No private screenshots, actual record contents, names, identifiers or production totals are included in this repository report. No user approval for promotion has been received.
