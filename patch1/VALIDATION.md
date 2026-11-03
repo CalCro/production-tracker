@@ -31,3 +31,19 @@ Screenshots: file selection, preview/cancel, successful import, calculations, du
 7. Fully close Safari, reopen normal Safari, and open the Patch 1 address. Check the existing records, then the restore-test address and restored records. Do not clear website data or use private browsing.
 
 No offline support, account sync or guarantee against browser eviction is added. Candidate approval is still pending.
+
+## Patch 1 browser workflow completed — November 3, 2026
+
+Environment: remote desktop Chrome over the published HTTPS address. Synthetic records only; no iPhone records accessed. These checks do not establish iOS behavior.
+
+- Started Patch 1 at zero records / revision 0; entered DEMO-QA-1103 via the normal form with 10 produced, 2 NC and 1 scrap. Save verified at revision 1; report showed 7 good.
+- Backup All CSV completed a real browser download. Selected that exact downloaded file using the browser file chooser; preview showed zero new, one skipped ID and zero conflicts. Cancel preserved records.
+- Restore Test started at zero records / revision 0. Selected the same downloaded file; preview showed one new record and no writes before confirmation. Confirm restored one record at revision 1 with matching fields and totals.
+- Reimport into Restore Test showed zero new, one skipped and zero conflicts.
+- Exported restored records through Backup All CSV. Source and restored downloads were both 363 bytes and byte-for-byte identical, including IDs, timestamps and reason JSON. SHA-256: 7de4b32e7651ffee2cea54be66af65a913f9bc94027c675963a14efeeeed0333.
+- Closed both test tabs, created fresh tabs at the same addresses, and observed one record / revision 1 in each. History showed the original synthetic fields and totals in both. This tests tab reopening, not browser-process termination or iOS eviction.
+- Edited only the restored record to 11 produced. Restore Test advanced to revision 2 with 8 good. Source remained revision 1 with 10 produced and 7 good, without a cross-tab storage warning.
+- Previewed the older downloaded file against the edited Restore Test record: zero new, one skipped ID, one genuine conflict. Confirm Add New Records reported no new records, retained the edited 11-produced record, and kept revision 2.
+- No application source changes were required by this workflow. The synthetic test records remain in the remote browser only; no user-device data was changed.
+
+Still requires iPhone confirmation: Patch 1 date-control layout, restoring the user's actual downloaded backup through iOS Files, unchanged normal records afterward, and full Safari close/reopen persistence. Candidate promotion remains pending approval.
