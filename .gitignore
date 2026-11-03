@@ -1,0 +1,5 @@
+*.csv
+*.zip
+private-fixtures/
+node_modules/
+.openai/
