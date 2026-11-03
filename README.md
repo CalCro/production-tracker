@@ -1,10 +1,10 @@
-# Production Tracker v0.6 Personal Edition — release review
+# Production Tracker v0.6 Personal Edition — approved release
 
-Status: prepared for approval; not deployed. The live Pages branch is candidate/v0.6-recovery. Do not merge this proposal until the user explicitly approves promotion.
+Status: user approved promotion on November 3, 2026. PR #1 was merged as 65391b68891737824b2fe2b72bfa73d0fe79aa09 into the serving branch candidate/v0.6-recovery. GitHub Pages publishes this branch. Main remains unchanged.
 
-## Proposed deployment
+## Deployment
 
-Merge the reviewed release commit into candidate/v0.6-recovery, which already backs GitHub Pages. This replaces index.html and core.js at the existing address with the tested Patch 1 application and a Personal Edition label. Keep main unchanged. Confirm the base has not changed before merging.
+The approved release was merged into candidate/v0.6-recovery, which backs GitHub Pages. It replaces index.html and core.js at the existing address with the tested Patch 1 application and a Personal Edition label. Main was not changed.
 
 Storage key and schema remain production_tracker_v06_candidate / schema 6. No data migration, reset or automatic write runs on startup. Existing browser records and snapshots remain in place. No real employee or production data is in the release.
 

@@ -55,3 +55,7 @@ User-supplied screenshots and report confirm a downloaded CSV restored successfu
 A subsequent pair of screenshots shows the normal candidate retaining its earlier record count while Restore Test has its separate restored collection. Counts support isolation; the screenshots do not show the normal candidate's diagnostic revision. No independent byte comparison of the user's two collections was performed. The restore test covers the selected backup, not proof that it contains every normal candidate record.
 
 No private screenshots, actual record contents, names, identifiers or production totals are included in this repository report. No user approval for promotion has been received.
+
+## Approval and promotion — November 3, 2026
+
+The user explicitly approved promotion of v0.6 Personal Edition. Reviewed source 3b3a403e0d2fb249e2a11301ff79edd920308555 was merged through PR #1 into candidate/v0.6-recovery as 65391b68891737824b2fe2b72bfa73d0fe79aa09. Both source and target heads matched the reviewed values immediately before merge. This approval supersedes earlier pending-approval notes in this historical report. Main, original backups, Patch 1 pages and the preserved legacy recovery source remain unchanged. Storage schema/key are unchanged; no migration or reset was introduced. Pages deployment and live startup are checked separately during the promotion handoff.
